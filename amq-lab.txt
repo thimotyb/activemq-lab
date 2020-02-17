@@ -1,0 +1,85 @@
+docker pull rmohr/activemq
+
+docker run --user root --rm -ti \
+  -v /your/persistent/dir/conf:/mnt/conf \
+  -v /your/persistent/dir/data:/mnt/data \
+  rmohr/activemq:5.15.4-alpine /bin/sh
+  
+chown activemq:activemq /mnt/conf
+chown activemq:activemq /mnt/data
+cp -a /opt/activemq/conf/* /mnt/conf/
+cp -a /opt/activemq/data/* /mnt/data/
+exit
+
+
+repo.maven.apache.org 151.101.12.215
+archiva.openqa.org
+
+151.101.12.215 archiva.openqa.org
+
+echo "151.101.12.215 archiva.openqa.org" >> /etc/hosts
+export ACTIVEMQ_HOME=/opt/activemq
+
+docker run --user root --rm -ti --name activemq -d rmohr/activemq
+
+docker run --user root --rm -ti \
+  -v /home/thimoty_barbieri/activemq-in-action/examples/conf:/mnt/conf \
+  -v /home/thimoty_barbieri/activemq-in-action/examples/data:/mnt/data \
+  rmohr/activemq:5.15.4-alpine /bin/sh
+  
+docker run -p 61616:61616 -p 8161:8161 --name host1 \
+  -v /home/thimoty_barbieri/activemq-in-action/examples/conf:/mnt/conf \
+  -v /home/thimoty_barbieri/activemq-in-action/examples/data:/mnt/data \
+  rmohr/activemq:5.15.4-alpine &
+
+docker run -p 61616:61616 -p 8161:8161 --name activemq -d thimoty/activemq-lab
+
+sudo docker run --user root --rm -ti --name activemq-root -d thimoty/activemq-lab
+  
+sudo docker exec -ti activemq /bin/bash
+
+
+
+cd /usr/devel/activemq-in-action/
+
+git clone https://github.com/thimotyb/activemq-in-action
+
+cd examples/
+mvn clean install
+
+ln -s /home/thimoty_barbieri/activemq-in-action/examples/src/main/java/org/apache/activemq/book active-devel
+
+STANDALONE (TOPIC)
+
+Run consumer:
+mvn exec:java -Dexec.mainClass=org.apache.activemq.book.ch3.portfolio.Consumer -Dexec.args="CSCO ORCL"
+
+
+Run publisher:
+mvn exec:java -Dexec.mainClass=org.apache.activemq.book.ch3.portfolio.Publisher -Dexec.args="CSCO ORCL"
+
+STANDALONE (QUEUE)
+mvn exec:java -Dexec.mainClass=org.apache.activemq.book.ch3.jobs.Publisher
+mvn exec:java -Dexec.mainClass=org.apache.activemq.book.ch3.jobs.Consumer
+
+USING CONNECTORS:
+mvn exec:java -Dexec.mainClass=org.apache.activemq.book.ch4.Publisher -Dexec.args="tcp://localhost:61616 CSCO ORCL"
+mvn exec:java -Dexec.mainClass=org.apache.activemq.book.ch4.Consumer -Dexec.args="tcp://localhost:61616 CSCO ORCL"
+
+<transportConnector name="ssl" uri="ssl://localhost:61617?trace=true" />
+
+mvn \
+-Djavax.net.ssl.keyStore=/opt/activemq/conf/client.ks \
+-Djavax.net.ssl.keyStorePassword=password \
+-Djavax.net.ssl.trustStore=/opt/activemq/conf/client.ts \
+exec:java -Dexec.mainClass=org.apache.activemq.book.ch4.Publisher \
+-Dexec.args="ssl://localhost:61617 CSCO ORCL"
+
+
+ps axjf
+pkill -s 1 (SID)
+
+mvn exec:java -Dexec.mainClass=org.apache.activemq.book.ch4.Consumer -Dexec.args="failover:(tcp://activemq-local-master:61616,tcp://activemq-root:61616)&randomize=false CSCO ORCL"        
+
+mvn exec:java -Dexec.mainClass=org.apache.activemq.book.ch4.Publisher -Dexec.args="failover:(tcp://activemq-local-master:61616,tcp://activemq-local-slave:61616)&randomize=false CSCO ORCL"
+mvn exec:java -Dexec.mainClass=org.apache.activemq.book.ch4.Consumer -Dexec.args="failover:(tcp://activemq-local-master:61616,tcp://activemq-local-slave:61616)&randomize=false CSCO ORCL"        

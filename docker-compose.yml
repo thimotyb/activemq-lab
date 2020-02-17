@@ -1,0 +1,31 @@
+version: '2'
+services:
+  activemq-root:
+     image:   thimoty/activemq-lab:latest
+     volumes:
+       - /home/thimoty_barbieri/activemq-in-action/examples/conf:/opt/activemq/conf
+       - /home/thimoty_barbieri/activemq-in-action/examples/data:/opt/activemq/data
+  activemq-local-master:
+      image: bwolf/activemq-prometheus:latest
+      ports:
+         - "8161:8161"
+         - "61616:61616"
+      volumes:
+       - /home/thimoty_barbieri/activemq-in-action/examples/conf-local-master:/opt/activemq/conf
+       - /home/thimoty_barbieri/activemq-in-action/examples/data-local-master:/opt/activemq/data
+  activemq-local-slave:
+      image: bwolf/activemq-prometheus:latest
+  activemq-remote-master:
+      image: bwolf/activemq-prometheus:latest
+  activemq-remote-slave:
+      image: bwolf/activemq-prometheus:latest
+  grafana:
+      image: grafana/grafana:latest
+      ports:
+         - "3000:3000"
+  prometheus:
+      image: prom/prometheus
+      ports:
+         - "9090:9090"
+      volumes:
+      - /home/thimoty_barbieri/activemq-in-action/examples/prometheus.yml:/etc/prometheus/prometheus.yml
