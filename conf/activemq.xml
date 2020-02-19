@@ -118,9 +118,9 @@
             <transportConnector name="ws" uri="ws://0.0.0.0:61614?maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600"/>
         </transportConnectors>
 
-        <networkConnectors>
+        <!--networkConnectors>
                 <networkConnector name="local network" uri="static://(tcp://activemq-local-master:61616)"/>
-        </networkConnectors>
+        </networkConnectors-->
 	
         <!-- destroy the spring context on shutdown to stop jetty -->
         <shutdownHooks>

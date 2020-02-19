@@ -11,7 +11,16 @@
         <!-- You can use Spring XML syntax to define the routes here using the <route> element -->
         <route>
             <from uri="activemq:topic:Test.MyCamelTopic"/>
-            <to uri="activemq:queue:Test.MyCamelQueue"/>
+            <choice>
+             <when>
+                <simple>${bodyAs(String)} contains 'GIGIO'</simple>
+                <to uri="activemq:queue:Test.MyCamelQueueRouted"/>
+             </when>
+             <otherwise>
+                <to uri="activemq:queue:Test.MyCamelQueue"/>
+             </otherwise>
+            </choice>
+            <!--to uri="stream:out"/-->
         </route>
         
 	<!--
